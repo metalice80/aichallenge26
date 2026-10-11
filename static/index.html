@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Локальная LLM · лаборатория оптимизации</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">◈</span><span>Локальная LLM <small>Лаборатория оптимизации</small></span></div>
+    <span class="local-badge">Локально · LM Studio</span>
+  </header>
+  <nav class="tabs" aria-label="Разделы">
+    <button class="tab active" type="button" data-section="chat" aria-current="page">01 <strong>Чат</strong></button>
+    <button class="tab" type="button" data-section="profiles">02 <strong>Профили</strong></button>
+    <button class="tab" type="button" data-section="comparison">03 <strong>Сравнение</strong></button>
+  </nav>
+  <main>
+    <div id="notice" class="notice" role="alert" hidden></div>
+    <div id="model-notice" class="notice warning" role="status" hidden><span id="model-notice-text"></span><button id="retry-models" type="button" class="link-button">Повторить</button></div>
+
+    <section id="chat" class="section active" aria-label="Чат">
+      <div class="section-heading"><div><p class="eyebrow">01 / ДИАЛОГ</p><h1>Чат с локальной моделью</h1><p class="muted">История сохраняется. Параметры каждого ответа фиксируются отдельно.</p></div><button id="new-chat" class="button primary" type="button">+ Новый чат</button></div>
+      <div class="chat-layout">
+        <aside class="panel chat-sidebar"><div class="panel-title">Диалоги <span id="chat-count" class="count"></span></div><div id="chats-list" class="item-list" aria-label="Сохранённые чаты"></div></aside>
+        <div class="panel conversation">
+          <div class="conversation-bar"><strong id="chat-title">Выберите или создайте чат</strong><div class="inline-actions"><button id="rename-chat" class="button subtle" type="button" disabled>Переименовать</button><button id="delete-chat" class="button danger-quiet" type="button" disabled>Удалить</button></div></div>
+          <div id="messages" class="messages" aria-live="polite" aria-relevant="additions text"></div>
+          <form id="send-form" class="composer"><label for="chat-profile">Профиль для ответа</label><select id="chat-profile" required></select><label for="chat-input">Сообщение</label><textarea id="chat-input" rows="3" placeholder="Напишите вопрос…" required></textarea><div class="composer-bottom"><span class="muted small">Ctrl/⌘ + Enter — отправить</span><button id="send-button" class="button primary" type="submit">Отправить ↗</button></div></form>
+        </div>
+      </div>
+    </section>
+
+    <section id="profiles" class="section" aria-label="Профили" hidden>
+      <div class="section-heading"><div><p class="eyebrow">02 / КОНФИГУРАЦИЯ</p><h1>Профили модели</h1><p class="muted">Меняйте параметры для будущих запросов; сохранённые результаты не изменятся.</p></div><button id="new-profile" class="button primary" type="button">+ Новый профиль</button></div>
+      <div class="edit-layout"><aside class="panel"><div class="panel-title">Сохранённые профили <span id="profile-count" class="count"></span></div><div id="profiles-list" class="item-list"></div></aside>
+        <div class="panel form-panel"><div class="form-heading"><h2 id="profile-heading">Новый профиль</h2><button id="copy-profile" class="button subtle" type="button" disabled>Создать копию</button></div>
+          <form id="profile-form"><div class="field"><label for="profile-name">Название</label><input id="profile-name" required maxlength="120" placeholder="Например, помощник по Python · базовый"></div>
+            <div class="field"><label for="profile-model">Установленная модель</label><select id="profile-model" required></select><div id="model-help" class="hint"></div></div>
+            <div class="field"><label for="profile-variant">Вариант модели</label><select id="profile-variant"></select><div id="variant-help" class="hint"></div></div>
+            <div class="field-grid"><div class="field"><label for="profile-temperature">Температура</label><input id="profile-temperature" type="number" min="0" max="2" step="0.01" required value="0.7"></div><div class="field"><label for="profile-tokens">Максимум токенов ответа</label><input id="profile-tokens" type="number" min="1" max="32768" step="1" required value="512"></div><div class="field"><label for="profile-context">Окно контекста</label><input id="profile-context" type="number" min="256" step="1" required value="4096"><div id="context-help" class="hint"></div></div></div>
+            <div class="field"><label for="profile-system">System prompt</label><textarea id="profile-system" rows="5" placeholder="Инструкция для модели"></textarea></div>
+            <div class="form-actions"><button id="save-profile" class="button primary" type="submit">Сохранить профиль</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="comparison" class="section" aria-label="Сравнение" hidden>
+      <div class="section-heading"><div><p class="eyebrow">03 / ЭКСПЕРИМЕНТ</p><h1>Сравнение профилей</h1><p class="muted">Одни вопросы, независимые ответы, повторные измерения и ручная оценка.</p></div></div>
+      <div class="comparison-grid"><div class="panel form-panel"><h2>Новый запуск</h2><form id="run-form">
+          <div class="field"><label for="run-suite">Набор вопросов</label><select id="run-suite" required></select></div><div id="suite-preview" class="hint"></div>
+          <div class="field-grid"><div class="field"><label for="run-baseline">Базовый профиль</label><select id="run-baseline" required></select></div><div class="field"><label for="run-optimized">Оптимизированный профиль</label><select id="run-optimized" required></select></div><div class="field"><label for="run-repeats">Повторов на вопрос</label><input id="run-repeats" type="number" min="1" max="10" step="1" value="3" required></div></div>
+          <button id="start-run" class="button primary" type="submit">Запустить сравнение ↗</button><p class="hint">Запуск выполняется последовательно. Не закрывайте приложение до завершения.</p>
+        </form></div>
+        <div class="panel form-panel"><h2>Новый набор вопросов</h2><form id="suite-form"><div class="field"><label for="suite-name">Название набора</label><input id="suite-name" maxlength="120" required placeholder="Например, задачи по Python"></div><div class="field"><label>Вопросы и критерии ответа</label><div id="case-fields" class="case-fields"></div><button id="add-case" class="button subtle" type="button">+ Добавить вопрос</button></div><button id="save-suite" class="button secondary" type="submit">Сохранить набор</button></form></div>
+      </div>
+      <div class="runs-panel panel"><div class="panel-title">История запусков <span id="run-count" class="count"></span></div><div id="runs-list" class="run-list"></div></div>
+      <div id="run-detail" class="run-detail" hidden></div>
+    </section>
+  </main>
+  <footer>Локальный эксперимент · оценки качества выставляет человек, а не модель.</footer>
+</body>
+</html>
