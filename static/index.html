@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Локальный чат · LM Studio</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Список чатов">
+      <div class="sidebar-heading">
+        <h1>Локальный чат</h1>
+        <button id="new-chat" type="button" class="primary small">Новый чат</button>
+      </div>
+      <div id="health" class="connection" role="status" aria-live="polite">Проверяем LM Studio…</div>
+      <nav id="chat-list" class="chat-list" aria-label="Чаты"></nav>
+      <p id="list-empty" class="sidebar-empty" hidden>Пока нет чатов. Создайте первый.</p>
+    </aside>
+
+    <main class="main">
+      <header class="toolbar">
+        <div class="title-area">
+          <h2 id="chat-title">Выберите чат</h2>
+          <span id="chat-subtitle" class="muted">История сохраняется на этом компьютере</span>
+        </div>
+        <div class="chat-actions">
+          <button id="rename-chat" type="button" disabled>Переименовать</button>
+          <button id="delete-chat" type="button" class="danger" disabled>Удалить</button>
+        </div>
+      </header>
+      <section class="model-bar" aria-label="Выбор модели">
+        <label for="model-select">Модель</label>
+        <select id="model-select" aria-describedby="model-state"><option value="">Модель не выбрана</option></select>
+        <button id="refresh-models" type="button">Обновить модели</button>
+        <span id="model-state" class="muted" role="status" aria-live="polite"></span>
+      </section>
+      <p id="notice" class="notice" role="alert" hidden></p>
+      <section id="messages" class="messages" role="log" aria-label="История сообщений" aria-live="polite" aria-relevant="additions text">
+        <p class="empty-message">Выберите чат или создайте новый, чтобы начать разговор.</p>
+      </section>
+      <form id="composer" class="composer" aria-label="Отправка сообщения">
+        <label for="message-input">Сообщение</label>
+        <textarea id="message-input" rows="3" maxlength="8000" placeholder="Напишите сообщение…" required></textarea>
+        <div class="composer-bottom">
+          <span id="send-hint" class="muted">Выберите чат и модель, чтобы отправить сообщение.</span>
+          <button id="send" type="submit" class="primary" disabled>Отправить</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>
