@@ -1,0 +1,41 @@
+services:
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: llama-server
+    restart: unless-stopped
+
+    expose:
+      - "8080"
+
+    volumes:
+      - /mnt/sd/llama-cache:/root/.cache
+
+    command:
+      - -hf
+      - "${MODEL}"
+
+    environment:
+      LLAMA_ARG_HOST: 0.0.0.0
+      LLAMA_ARG_PORT: 8080
+      LLAMA_ARG_THREADS: "${CPU_THREADS}"
+
+      # Максимальный контекст для одного запроса
+      LLAMA_ARG_KV_UNIFIED_PER_SLOT: "${MAX_CONTEXT}"
+
+      # Количество одновременно обрабатываемых запросов
+      LLAMA_ARG_N_PARALLEL: "${PARALLEL_REQUESTS}"
+
+      LLAMA_ARG_ENDPOINT_METRICS: 1
+
+  nginx:
+    image: nginx:alpine
+    container_name: llm-gateway
+    restart: unless-stopped
+    depends_on:
+      - llama-server
+
+    ports:
+      - "${PORT}:80"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
